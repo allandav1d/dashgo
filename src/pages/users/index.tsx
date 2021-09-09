@@ -6,29 +6,10 @@ import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
 import Link from 'next/link'
 
-import { useQuery } from "react-query";
+import { useUsers } from "../../services/hooks/useUsers";
 
 export default function UserList() {
-  const { data, isLoading, error } = useQuery('users', async () => {
-    const response = await fetch('http://localhost:3000/api/users')
-    const data = await response.json()
-
-    const users = data.users.map(user => {
-      return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: new Date(user.createdAt).toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        })
-      }
-    })
-    return users
-  }, {
-    staleTime: 1000 * 5
-  });
+  const { data, isLoading, error } = useUsers()
 
   console.log(data)
   const isWideVersion = useBreakpointValue({
@@ -119,7 +100,7 @@ export default function UserList() {
 
                 </Table>
 
-                <Pagination />
+                <Pagination totalCountOfRegisters={200} currentPage={5} onPageChange={() => { }} />
               </>
             )
           }
