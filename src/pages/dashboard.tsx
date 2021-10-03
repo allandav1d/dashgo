@@ -1,4 +1,4 @@
-import { Flex, SimpleGrid, Box, Text, theme } from "@chakra-ui/react";
+import { Flex, SimpleGrid, Box, Text, theme, Button, Icon } from "@chakra-ui/react";
 import dynamic from 'next/dynamic';
 import React, { useContext, useEffect } from "react";
 import { Header } from "../components/Header";
@@ -7,6 +7,10 @@ import { AuthContext } from "../contexts/AuthContext";
 import { apiAuth } from "../services/apiClient";
 import { setupAPIClient } from "../services/api";
 import { withSSRAuth } from "../utils/withSSRAuth";
+import { useCan } from "../services/hooks/useCan";
+import { Can } from "../components/Can";
+
+import { GiExitDoor } from 'react-icons/gi'
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false })
 
@@ -66,7 +70,11 @@ const series = [
 ]
 
 export default function Dashboard() {
-  const { user } = useContext(AuthContext)
+  const { user, signOut } = useContext(AuthContext)
+
+  const userCanSeeMetrics = useCan({
+    permissions: ['metrics.list']
+  })
 
   useEffect(() => {
     apiAuth.get('/me')
@@ -85,6 +93,21 @@ export default function Dashboard() {
 
           <Box p={['6', '8']} bg="gray.800" borderRadius={8} pb='4'>
             <Text fontSize="lg" mb='4'>Dash:{user?.email}</Text>
+            <Can permissions={['metrics.list']}>
+              <Text fontSize="lg" mb='4'>Autorizado a ver as metricas</Text>
+            </Can>
+
+            <Button
+              as='a'
+              size='sm'
+              fontSize='sm'
+              colorScheme='pink'
+              onClick={signOut}
+              leftIcon={<Icon as={GiExitDoor} fontSize='20' />}
+            >
+              Sair
+            </Button>
+
           </Box>
 
           <Box p={['6', '8']} bg="gray.800" borderRadius={8} pb='4'>
