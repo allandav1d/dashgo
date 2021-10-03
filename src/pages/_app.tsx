@@ -6,24 +6,27 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { makeServer } from '../services/mirage'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { queryClient } from '../services/queryClient'
+import { AuthProvider } from '../contexts/AuthContext'
 
 if (process.env.NODE_ENV === 'development') {
-  makeServer();
+  //makeServer();
 }
 
 
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ChakraProvider theme={theme}>
-        <SidebarDrawerProvider>
-          <Component {...pageProps} />
-        </SidebarDrawerProvider>
-      </ChakraProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider theme={theme}>
+          <SidebarDrawerProvider>
+            <Component {...pageProps} />
+          </SidebarDrawerProvider>
+        </ChakraProvider>
 
-      <ReactQueryDevtools />
-    </QueryClientProvider>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
+    </AuthProvider>
   )
 }
 

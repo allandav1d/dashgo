@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Flex, Button, Stack } from '@chakra-ui/react'
 import { Input } from '../components/Form/Input'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SubmitHandler, useForm } from 'react-hook-form'
-
+import { AuthContext } from '../contexts/AuthContext'
+import { GetServerSideProps } from 'next'
+import { parseCookies } from 'nookies'
+import { withSSRGuest } from '../utils/withSSRGuest'
 
 type SignInFormData = {
   email: string,
@@ -17,6 +20,8 @@ const signInFormSchema = yup.object().shape({
 })
 
 export default function SignIn() {
+  const { singIn } = useContext(AuthContext)
+
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(signInFormSchema)
   })
@@ -24,8 +29,7 @@ export default function SignIn() {
   const { errors } = formState
 
   const handleSignIn: SubmitHandler<SignInFormData> = async (values) => {
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    console.log(values)
+    await singIn(values)
   }
 
 
@@ -78,3 +82,11 @@ export default function SignIn() {
 
   )
 }
+
+
+export const getServerSideProps = withSSRGuest<{}>(async (ctx) => {
+
+  return {
+    props: {}
+  }
+})

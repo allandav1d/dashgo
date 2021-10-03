@@ -1,8 +1,12 @@
 import { Flex, SimpleGrid, Box, Text, theme } from "@chakra-ui/react";
 import dynamic from 'next/dynamic';
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
+import { AuthContext } from "../contexts/AuthContext";
+import { apiAuth } from "../services/apiClient";
+import { setupAPIClient } from "../services/api";
+import { withSSRAuth } from "../utils/withSSRAuth";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false })
 
@@ -62,6 +66,14 @@ const series = [
 ]
 
 export default function Dashboard() {
+  const { user } = useContext(AuthContext)
+
+  useEffect(() => {
+    apiAuth.get('/me')
+      .then((response) => { console.log(response) })
+      .catch((error) => { console.log(error) })
+  })
+
   return (
     <Flex direction='column' h='100vh'>
       <Header />
@@ -70,6 +82,10 @@ export default function Dashboard() {
         <Sidebar />
 
         <SimpleGrid flex='1' gap='4' minChildWidth='320px' align='flex-start'>
+
+          <Box p={['6', '8']} bg="gray.800" borderRadius={8} pb='4'>
+            <Text fontSize="lg" mb='4'>Dash:{user?.email}</Text>
+          </Box>
 
           <Box p={['6', '8']} bg="gray.800" borderRadius={8} pb='4'>
             <Text fontSize="lg" mb='4'>Inscritos da semana</Text>
@@ -88,3 +104,12 @@ export default function Dashboard() {
     </Flex>
   )
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  const apiClient = setupAPIClient(ctx)
+  const response = await apiClient.get('/me')
+
+  return {
+    props: {}
+  }
+})

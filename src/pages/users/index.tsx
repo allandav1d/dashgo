@@ -17,7 +17,6 @@ export default function UserList({ users, totalCount }) {
     initialData: users
   })
 
-  console.log(data)
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true
